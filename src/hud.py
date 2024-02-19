@@ -20,7 +20,7 @@ class Hud:
         self.debug_lines = {}
         self.rendered_lines = []
 
-        self.fps_list = [0]
+        self.fps_list = []
 
     def update(self, dt: float):
         if self.game.now - self.last_update_at < self.update_interval:
