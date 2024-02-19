@@ -24,18 +24,20 @@ class Player(pg.sprite.Sprite):
         self.jump_cooldown = 1 / 5  # ? cooldown or on spacebar repress
         self.last_jump_at = 0
 
-        self.idle_sprite = pg.image.load("assets/player/idle.png").convert_alpha()
-        self.run_sprite = pg.image.load("assets/player/run.png").convert_alpha()
-        self.jump_sprite = pg.image.load("assets/player/jump.png").convert_alpha()
-        self.double_jump_sprite = pg.image.load(
-            "assets/player/double_jump.png"
-        ).convert_alpha()
-        self.fall_sprite = pg.image.load("assets/player/fall.png").convert_alpha()
+        self.sprites = {
+            "idle": pg.image.load("assets/player/idle.png").convert_alpha(),
+            "run": pg.image.load("assets/player/run.png").convert_alpha(),
+            "jump": pg.image.load("assets/player/jump.png").convert_alpha(),
+            "double_jump": pg.image.load(
+                "assets/player/double_jump.png"
+            ).convert_alpha(),
+            "fall": pg.image.load("assets/player/fall.png").convert_alpha(),
+        }
 
         self.last_frame_at = 0
         self.frame_interval = 1 / 20
 
-        self.sprite = self.idle_sprite
+        self.sprite = self.sprites["idle"]
         self.current_frame = 0
         self.flipped = False
 
@@ -94,17 +96,17 @@ class Player(pg.sprite.Sprite):
 
     def fixed_update(self, dt: float = 0):
         if self.velocity.x != 0:
-            self.sprite = self.run_sprite
+            self.sprite = self.sprites["run"]
         else:
-            self.sprite = self.idle_sprite
+            self.sprite = self.sprites["idle"]
 
         if self.velocity.y > 0:
-            self.sprite = self.fall_sprite
+            self.sprite = self.sprites["fall"]
         elif self.velocity.y < 0:
             if self.jump_counter > 1:
-                self.sprite = self.double_jump_sprite
+                self.sprite = self.sprites["double_jump"]
             else:
-                self.sprite = self.jump_sprite
+                self.sprite = self.sprites["jump"]
 
     def draw(self, target: pg.Surface):
         if self.game.now - self.last_frame_at > self.frame_interval:
