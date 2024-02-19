@@ -1,11 +1,14 @@
 import time
 
+from .hud import Hud
 from .settings import *
 from .camera import Camera
 from .player import Player
 
 
 class Game:
+    pg.init()
+    
     def __init__(self, vsync=False) -> None:
         self.win_size = self.win_width, self.win_height = (1280, 720)
         self.size = self.width, self.height = (320, 180)
@@ -29,6 +32,8 @@ class Game:
         self.player = Player(self, self.width / 2, self.height / 2)
         self.camera.follow = self.player.rect
 
+        self.hud = Hud(self)
+
     def handle_events(self):
         events = pg.event.get()
 
@@ -46,8 +51,8 @@ class Game:
         self.prev_time = self.now
 
     def update(self):
-        self.camera.update(self.target)
         self.player.update(self.dt)
+        self.camera.update(self.target)
 
     def fixed_update(self):
         if not self.now - self.last_fixed_update_at > self.fixed_update_rate:
@@ -55,6 +60,7 @@ class Game:
         self.last_fixed_update_at = self.now
 
         self.player.fixed_update(self.dt)
+        self.hud.update(self.dt)
 
     def draw(self):
         self.target.fill(pg.Color(26, 26, 32))
@@ -63,6 +69,9 @@ class Game:
         self.player.draw(self.target, self.camera.scroll)
 
         pg.transform.scale(self.target, self.win_size, self.window)
+
+        self.hud.draw(self.window)
+
         pg.display.update()
         self.clock.tick()
 
