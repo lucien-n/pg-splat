@@ -66,6 +66,22 @@ class Game:
         self.target.fill(pg.Color(26, 26, 32))
         pg.display.set_caption(f"{self.clock.get_fps():.1f}")
 
+        # ? draw origin
+        pg.draw.line(
+            self.target,
+            pg.Color(255, 255, 255, 40),
+            vector(0, self.height - self.camera.scroll.y),
+            vector(self.width, self.height - self.camera.scroll.y),
+        )
+
+        pg.draw.line(
+            self.target,
+            pg.Color(255, 255, 255, 40),
+            vector(-self.camera.scroll.x, 0),
+            vector(-self.camera.scroll.x, self.height),
+        )
+        # ? end draw origin
+
         self.player.draw(self.target, self.camera.scroll)
 
         pg.transform.scale(self.target, self.win_size, self.window)
