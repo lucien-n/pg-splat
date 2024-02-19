@@ -17,16 +17,23 @@ class Player(pg.sprite.Sprite):
         self.gravity = 1200
 
         self.velocity = vector(0, 0)
-        self.is_grounded = True
+        self.is_grounded = False
         self.is_running = False
+        self.jump_counter = 0
+        self.max_jumps = 2
+        self.jump_cooldown = 1 / 5  # ? cooldown or on spacebar repress
+        self.last_jump_at = 0
 
         self.idle_sprite = pg.image.load("assets/player/idle.png").convert_alpha()
         self.run_sprite = pg.image.load("assets/player/run.png").convert_alpha()
         self.jump_sprite = pg.image.load("assets/player/jump.png").convert_alpha()
+        self.double_jump_sprite = pg.image.load(
+            "assets/player/double_jump.png"
+        ).convert_alpha()
         self.fall_sprite = pg.image.load("assets/player/fall.png").convert_alpha()
 
         self.last_frame_at = 0
-        self.frame_interval = 1 / 15
+        self.frame_interval = 1 / 20
 
         self.sprite = self.idle_sprite
         self.current_frame = 0
@@ -51,9 +58,15 @@ class Player(pg.sprite.Sprite):
         else:
             self.velocity.x = 0
 
-        if pg.K_SPACE in self.keys and self.is_grounded:
-            self.is_grounded = False
-            self.velocity.y = -self.jump_force
+        if pg.K_SPACE in self.keys:
+            if self.is_grounded or (
+                self.jump_counter < self.max_jumps
+                and self.game.now - self.last_jump_at > self.jump_cooldown
+            ):
+                self.is_grounded = False
+                self.jump_counter += 1
+                self.last_jump_at = self.game.now
+                self.velocity.y = -self.jump_force
 
         new_pos = vector(
             self.rect.x + self.velocity.x * dt, self.rect.y + self.velocity.y * dt
@@ -64,6 +77,7 @@ class Player(pg.sprite.Sprite):
 
         if new_pos.y > self.game.height - self.rect.h:
             self.is_grounded = True
+            self.jump_counter = 0
             self.velocity.y = 0
             new_pos.y = self.game.height - self.rect.h
 
@@ -87,7 +101,10 @@ class Player(pg.sprite.Sprite):
         if self.velocity.y > 0:
             self.sprite = self.fall_sprite
         elif self.velocity.y < 0:
-            self.sprite = self.jump_sprite
+            if self.jump_counter > 1:
+                self.sprite = self.double_jump_sprite
+            else:
+                self.sprite = self.jump_sprite
 
     def draw(self, target: pg.Surface):
         if self.game.now - self.last_frame_at > self.frame_interval:
