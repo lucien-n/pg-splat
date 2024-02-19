@@ -8,11 +8,21 @@ class Camera:
         self.follow: pg.Rect = None
 
     def update(self, target: pg.Surface):
-        if self.follow.x - self.scroll.x != target.get_width() / 2:
+        if (
+            self.follow.x - (self.follow.w / 2) - self.scroll.x
+            != target.get_width() / 2
+        ):
             self.scroll.x += (
-                self.follow.x - (self.scroll.x + target.get_width() / 2)
+                self.follow.x
+                + (self.follow.w / 2)
+                - (self.scroll.x + target.get_width() / 2)
             ) / self.smoothness
-        if self.follow.y - self.follow.y != target.get_height() / 2:
+        if (
+            self.follow.y - (self.follow.h / 2) - self.follow.y
+            != target.get_height() / 2
+        ):
             self.scroll.y += (
-                self.follow.y - (self.scroll.y + target.get_height() / 2)
+                self.follow.y
+                + (self.follow.h / 2)
+                - (self.scroll.y + target.get_height() / 2)
             ) / self.smoothness
