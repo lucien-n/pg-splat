@@ -81,12 +81,6 @@ class Player(pg.sprite.Sprite):
             self.velocity.y = 0
             new_pos.y = self.game.height - self.rect.h
 
-        if new_pos.x < -self.rect.w:
-            new_pos.x = self.game.width
-
-        if new_pos.x > self.game.width:
-            new_pos.x = -self.rect.w
-
         self.is_running = self.velocity.x != 0
 
         self.rect.x = new_pos.x
