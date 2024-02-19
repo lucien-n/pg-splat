@@ -2,8 +2,8 @@ from .settings import *
 
 
 class Camera:
-    def __init__(self, smoothness: int = 12) -> None:
-        self.smoothness = smoothness
+    def __init__(self) -> None:
+        self.smoothness = settings["camera"]["smoothness"]
         self.scroll = vector(0, 0)
         self.follow: pg.Rect = None
 

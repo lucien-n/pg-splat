@@ -8,7 +8,7 @@ from .player import Player
 
 class Game:
     pg.init()
-    
+
     def __init__(self, vsync=False) -> None:
         self.win_size = self.win_width, self.win_height = (1280, 720)
         self.size = self.width, self.height = (320, 180)
@@ -27,7 +27,7 @@ class Game:
 
         self.running = True
 
-        self.camera = Camera(36)
+        self.camera = Camera()
 
         self.player = Player(self, self.width / 2, self.height / 2)
         self.camera.follow = self.player.rect
