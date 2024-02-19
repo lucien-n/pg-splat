@@ -11,7 +11,10 @@ class Game:
 
     def __init__(self, vsync=False) -> None:
         self.win_size = self.win_width, self.win_height = (1280, 720)
-        self.size = self.width, self.height = (320, 180)
+        self.size = self.width, self.height = (
+            320 / settings["camera"]["zoom"],
+            180 / settings["camera"]["zoom"],
+        )
 
         self.window = pg.display.set_mode(self.win_size, vsync=vsync)
         self.clock = pg.time.Clock()
