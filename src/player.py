@@ -108,7 +108,7 @@ class Player(pg.sprite.Sprite):
             else:
                 self.sprite = self.sprites["jump"]
 
-    def draw(self, target: pg.Surface):
+    def draw(self, target: pg.Surface, scroll: vector):
         if self.game.now - self.last_frame_at > self.frame_interval:
             self.current_frame += 1
             self.last_frame_at = self.game.now
@@ -122,6 +122,9 @@ class Player(pg.sprite.Sprite):
                 if self.flipped
                 else self.sprite
             ),
-            self.rect,
+            (
+                (self.rect.x - (self.rect.w / 2)) - scroll.x,
+                (self.rect.y - (self.rect.h / 2)) - scroll.y,
+            ),
             pg.Rect(self.current_frame * self.rect.w, 0, self.rect.w, self.rect.h),
         )

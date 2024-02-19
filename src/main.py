@@ -1,6 +1,7 @@
 import time
 
 from .settings import *
+from .camera import Camera
 from .player import Player
 
 
@@ -23,7 +24,10 @@ class Game:
 
         self.running = True
 
+        self.camera = Camera(36)
+
         self.player = Player(self, self.width / 2, self.height / 2)
+        self.camera.follow = self.player.rect
 
     def handle_events(self):
         events = pg.event.get()
@@ -42,6 +46,7 @@ class Game:
         self.prev_time = self.now
 
     def update(self):
+        self.camera.update(self.target)
         self.player.update(self.dt)
 
     def fixed_update(self):
@@ -55,7 +60,7 @@ class Game:
         self.target.fill(pg.Color(26, 26, 32))
         pg.display.set_caption(f"{self.clock.get_fps():.1f}")
 
-        self.player.draw(self.target)
+        self.player.draw(self.target, self.camera.scroll)
 
         pg.transform.scale(self.target, self.win_size, self.window)
         pg.display.update()
