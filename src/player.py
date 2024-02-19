@@ -41,6 +41,7 @@ class Player(pg.sprite.Sprite):
         self.flipped = False
 
         self.keys = set()
+        self.movement_binds = settings["keybinds"]["movements"]
 
     def handle_events(self, events: list[pg.Event]):
         for e in events:
@@ -50,16 +51,16 @@ class Player(pg.sprite.Sprite):
                 self.keys.remove(e.key)
 
     def update(self, dt: float = 0):
-        if pg.K_a in self.keys:
+        if ord(self.movement_binds["left"]) in self.keys:
             self.velocity.x = -self.speed
             self.flipped = True
-        elif pg.K_d in self.keys:
+        elif ord(self.movement_binds["right"]) in self.keys:
             self.velocity.x = self.speed
             self.flipped = False
         else:
             self.velocity.x = 0
 
-        if pg.K_SPACE in self.keys:
+        if ord(self.movement_binds["jump"]) in self.keys:
             if self.is_grounded or (
                 self.jump_counter < self.max_jumps
                 and self.game.now - self.last_jump_at > self.jump_cooldown
