@@ -69,14 +69,14 @@ class Game:
         # ? draw origin
         pg.draw.line(
             self.target,
-            pg.Color(80, 80, 88),
+            pg.Color(80, 80, 86),
             vector(0, self.height - self.camera.scroll.y),
             vector(self.width, self.height - self.camera.scroll.y),
         )
 
         pg.draw.line(
             self.target,
-            pg.Color(80, 80, 88),
+            pg.Color(80, 80, 86),
             vector(-self.camera.scroll.x, 0),
             vector(-self.camera.scroll.x, self.height),
         )
