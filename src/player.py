@@ -21,7 +21,7 @@ class Player(pg.sprite.Sprite):
         self.is_grounded = False
         self.is_running = False
         self.jump_counter = 0
-        self.max_jumps = 2
+        self.max_jumps = 9999 if DEV else 2
         self.jump_cooldown = 1 / 5  # ? cooldown or on spacebar repress
         self.last_jump_at = 0
 
@@ -102,7 +102,7 @@ class Player(pg.sprite.Sprite):
             else:
                 self.sprite = self.sprites["jump"]
 
-    def draw(self, target: pg.Surface, scroll: vector):
+    def draw(self, target: surface, scroll: vector):
         if self.game.now - self.last_frame_at > self.frame_interval:
             self.current_frame += 1
             self.last_frame_at = self.game.now
