@@ -33,11 +33,9 @@ class Player(pg.sprite.Sprite):
             ).convert_alpha(),
             "fall": pg.image.load("assets/player/fall.png").convert_alpha(),
         }
-
+        self.sprite = self.sprites["idle"]
         self.last_frame_at = 0
         self.frame_interval = 1 / 20
-
-        self.sprite = self.sprites["idle"]
         self.current_frame = 0
         self.flipped = False
 
