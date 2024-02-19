@@ -22,6 +22,8 @@ class Player(pg.sprite.Sprite):
 
         self.idle_sprite = pg.image.load("assets/player/idle.png").convert_alpha()
         self.run_sprite = pg.image.load("assets/player/run.png").convert_alpha()
+        self.jump_sprite = pg.image.load("assets/player/jump.png").convert_alpha()
+        self.fall_sprite = pg.image.load("assets/player/fall.png").convert_alpha()
 
         self.last_frame_at = 0
         self.frame_interval = 1 / 15
@@ -62,6 +64,7 @@ class Player(pg.sprite.Sprite):
 
         if new_pos.y > self.game.height - self.rect.h:
             self.is_grounded = True
+            self.velocity.y = 0
             new_pos.y = self.game.height - self.rect.h
 
         if new_pos.x < -self.rect.w:
@@ -80,6 +83,11 @@ class Player(pg.sprite.Sprite):
             self.sprite = self.run_sprite
         else:
             self.sprite = self.idle_sprite
+
+        if self.velocity.y > 0:
+            self.sprite = self.fall_sprite
+        elif self.velocity.y < 0:
+            self.sprite = self.jump_sprite
 
     def draw(self, target: pg.Surface):
         if self.game.now - self.last_frame_at > self.frame_interval:
