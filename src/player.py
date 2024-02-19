@@ -1,4 +1,5 @@
 from .settings import *
+from .utils import apply_scroll
 
 
 class Player(pg.sprite.Sprite):
@@ -114,9 +115,6 @@ class Player(pg.sprite.Sprite):
                 if self.flipped
                 else self.sprite
             ),
-            (
-                (self.rect.x - (self.rect.w / 2)) - scroll.x,
-                (self.rect.y - (self.rect.h / 2)) - scroll.y,
-            ),
+            apply_scroll(self.rect, scroll),
             pg.Rect(self.current_frame * self.rect.w, 0, self.rect.w, self.rect.h),
         )
