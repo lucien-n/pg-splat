@@ -17,7 +17,12 @@ class DevLevel(Level):
         self.player = Player(self, display_width / 2, display_height / 2)
         self.camera.follow = self.player.rect
 
-        self.tiles = [Tile(0, 4), Tile(3, 5)]  # , Tile(1, 4), Tile(2, 4), Tile(5, 2)
+        self.tiles = [
+            Tile(0, 4),
+            Tile(3, 5),
+            Tile(1, 3),
+            Tile(6, 3),
+        ]  # , Tile(1, 4), Tile(2, 4), Tile(5, 2)
 
     def handle_events(self, events: list[pg.Event]):
         self.player.handle_events(events)
