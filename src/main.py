@@ -1,6 +1,9 @@
 import time
 
+
 from .hud import Hud
+from .utils import rtm
+from .tile import Tile
 from .settings import *
 from .camera import Camera
 from .player import Player
@@ -19,7 +22,7 @@ class Game:
         self.window = pg.display.set_mode(self.win_size, vsync=vsync)
         self.clock = pg.time.Clock()
 
-        self.target = pg.Surface(self.size)
+        self.target = surface(self.size)
 
         self.now = 0
         self.dt = 0
@@ -36,6 +39,8 @@ class Game:
         self.camera.follow = self.player.rect
 
         self.hud = Hud(self)
+
+        self.tiles = [Tile(0, 0)]
 
     def handle_events(self):
         events = pg.event.get()
@@ -85,6 +90,7 @@ class Game:
         )
         # ? end draw origin
 
+        [tile.draw(self.target, self.camera.scroll) for tile in self.tiles]
         self.player.draw(self.target, self.camera.scroll)
 
         pg.transform.scale(self.target, self.win_size, self.window)
