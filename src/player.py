@@ -34,7 +34,11 @@ class Player(pg.sprite.Sprite):
             ).convert_alpha(),
             "fall": pg.image.load("assets/player/fall.png").convert_alpha(),
         }
-        self.sprite = self.sprites["idle"]
+        self.animation_sprite = self.sprites["idle"]
+        self.image = pg.Surface((32, 32))
+        self.image.fill(Color.BLACK)
+        self.image.set_colorkey(Color.BLACK)
+
         self.last_frame_at = 0
         self.frame_interval = 1 / 20
         self.current_frame = 0
@@ -43,14 +47,65 @@ class Player(pg.sprite.Sprite):
         self.keys = set()
         self.movement_binds = settings["keybinds"]["movements"]
 
+        self.show_masks = False
+
     def handle_events(self, events: list[pg.Event]):
         for e in events:
             if e.type == pg.KEYDOWN:
                 self.keys.add(e.key)
+                if e.key == ord("m"):
+                    self.show_masks = not self.show_masks
             elif e.type == pg.KEYUP:
                 self.keys.remove(e.key)
 
-    def update(self, dt: float = 0):
+    def collide(self, new_pos: vector, colliders: list[pg.Rect]):
+        mask = pg.mask.from_surface(self.image)
+
+        for collider in colliders:
+            collider_surface = pg.Surface(collider.size)
+            collider_surface.fill(Color.WHITE)
+            collider_mask = pg.mask.from_surface(collider_surface)
+
+            overlap_mask = mask.overlap(
+                collider_mask,
+                (
+                    collider.x - new_pos.x,
+                    collider.y - new_pos.y,
+                ),
+            )
+
+            if overlap_mask:
+                collided_pos = new_pos
+
+                print(overlap_mask)
+
+                return collided_pos
+
+        return new_pos
+
+    def update(self, dt: float = 0, rects: list[pg.Rect] = []):
+        new_pos = vector(
+            self.rect.x + self.velocity.x * dt, self.rect.y + self.velocity.y * dt
+        )
+
+        if not self.is_grounded:
+            self.velocity.y += self.gravity * dt
+
+        if new_pos.y > display_height - self.rect.h:
+            self.is_grounded = True
+            self.jump_counter = 0
+            self.velocity.y = 0
+            new_pos.y = display_height - self.rect.h
+
+        self.is_running = self.velocity.x != 0
+
+        new_pos = self.collide(new_pos, rects)
+
+        self.rect.y = new_pos.y
+        self.rect.x = new_pos.x
+
+    def fixed_update(self, dt: float = 0):
+        # apply velocity based on inputs
         if ord(self.movement_binds["left"]) in self.keys:
             self.velocity.x = -self.speed
             self.flipped = True
@@ -70,38 +125,35 @@ class Player(pg.sprite.Sprite):
                 self.last_jump_at = self.level.game.now
                 self.velocity.y = -self.jump_force
 
-        new_pos = vector(
-            self.rect.x + self.velocity.x * dt, self.rect.y + self.velocity.y * dt
-        )
-
-        if not self.is_grounded:
-            self.velocity.y += self.gravity * dt
-
-        if new_pos.y > display_height - self.rect.h:
-            self.is_grounded = True
-            self.jump_counter = 0
-            self.velocity.y = 0
-            new_pos.y = display_height - self.rect.h
-
-        self.is_running = self.velocity.x != 0
-
-        self.rect.x = new_pos.x
-        self.rect.y = new_pos.y
-
-    def fixed_update(self, dt: float = 0):
+        # animation
         if self.velocity.x != 0:
-            self.sprite = self.sprites["run"]
+            self.animation_sprite = self.sprites["run"]
         else:
-            self.sprite = self.sprites["idle"]
+            self.animation_sprite = self.sprites["idle"]
 
         if self.velocity.y > 0:
-            self.sprite = self.sprites["fall"]
+            self.animation_sprite = self.sprites["fall"]
         elif self.velocity.y < 0:
             if self.jump_counter > 1:
-                self.sprite = self.sprites["double_jump"]
+                self.animation_sprite = self.sprites["double_jump"]
             else:
-                self.sprite = self.sprites["jump"]
+                self.animation_sprite = self.sprites["jump"]
 
+        if self.level.game.now - self.last_frame_at > self.frame_interval:
+            self.current_frame += 1
+            self.last_frame_at = self.level.game.now
+
+        if self.current_frame + 1 > self.animation_sprite.get_width() / self.rect.w:
+            self.current_frame = 0
+
+        self.image = self.animation_sprite.subsurface(
+            pg.Rect(self.current_frame * self.rect.w, 0, self.rect.w, self.rect.h)
+        )
+        self.image = (
+            pg.transform.flip(self.image, True, False) if self.flipped else self.image
+        )
+
+        # debug pos
         self.level.game.hud.debug_lines["pos"] = {
             "label": "\u0040",
             "value": f"{self.rect.x:.1f} {self.rect.y:.1f}",
@@ -109,19 +161,13 @@ class Player(pg.sprite.Sprite):
         }
 
     def draw(self, target: surface, scroll: vector):
-        if self.level.game.now - self.last_frame_at > self.frame_interval:
-            self.current_frame += 1
-            self.last_frame_at = self.level.game.now
+        target.blit(self.image, (display_width - self.rect.w, 0))
 
-        if self.current_frame + 1 > self.sprite.get_width() / self.rect.w:
-            self.current_frame = 0
-
-        target.blit(
-            (
-                pg.transform.flip(self.sprite, True, False)
-                if self.flipped
-                else self.sprite
-            ),
-            apply_scroll(self.rect, scroll),
-            pg.Rect(self.current_frame * self.rect.w, 0, self.rect.w, self.rect.h),
-        )
+        if self.show_masks:
+            mask = pg.mask.from_surface(self.image)
+            target.blit(
+                mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255, 255)),
+                apply_scroll(self.rect, scroll),
+            )
+        else:
+            target.blit(self.image, apply_scroll(self.rect, scroll))
