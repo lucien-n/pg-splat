@@ -4,6 +4,7 @@ import time
 from .hud import Hud
 from .settings import *
 from .levels.dev_level import DevLevel
+from .levels.other_dev_level import OtherDevLevel
 
 
 class Game:
@@ -34,8 +35,11 @@ class Game:
         for e in events:
             if e.type == pg.QUIT:
                 self.running = False
-            if e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
-                self.running = False
+            if e.type == pg.KEYDOWN:
+                if e.key == pg.K_ESCAPE:
+                    self.running = False
+                if e.key == pg.K_l:
+                    self.level = OtherDevLevel(self)
 
         self.level.handle_events(events)
 
