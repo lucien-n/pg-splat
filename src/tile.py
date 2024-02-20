@@ -14,8 +14,8 @@ class Tile(pg.sprite.Sprite):
             self.image,
             apply_scroll(
                 pg.Rect(
-                    self.rect.x,
-                    self.rect.y,
+                    self.rect.x * self.rect.w,
+                    self.rect.y * self.rect.h,
                     self.rect.w,
                     self.rect.h,
                 ),
