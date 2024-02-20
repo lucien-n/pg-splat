@@ -36,9 +36,9 @@ class Game:
             if e.type == pg.QUIT:
                 self.running = False
             if e.type == pg.KEYDOWN:
-                if e.key == pg.K_ESCAPE:
+                if e.key == pg.K_ESCAPE:  # !temp
                     self.running = False
-                if e.key == pg.K_l:
+                if e.key == pg.K_l:  # !temp
                     self.level = OtherDevLevel(self)
 
         self.level.handle_events(events)
