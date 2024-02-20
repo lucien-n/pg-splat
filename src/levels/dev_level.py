@@ -14,7 +14,7 @@ class DevLevel(Level):
 
         self.camera = Camera()
 
-        self.player = Player(self, self.game.width / 2, self.game.height / 2)
+        self.player = Player(self, display_width / 2, display_height / 2)
         self.camera.follow = self.player.rect
 
         self.tiles = [Tile(0, 0)]
@@ -35,15 +35,15 @@ class DevLevel(Level):
         pg.draw.line(
             target,
             pg.Color(80, 80, 86),
-            vector(0, self.game.height - self.camera.scroll.y),
-            vector(self.game.width, self.game.height - self.camera.scroll.y),
+            vector(0, display_height - self.camera.scroll.y),
+            vector(display_width, display_height - self.camera.scroll.y),
         )
 
         pg.draw.line(
             target,
             pg.Color(80, 80, 86),
             vector(-self.camera.scroll.x, 0),
-            vector(-self.camera.scroll.x, self.game.height),
+            vector(-self.camera.scroll.x, display_height),
         )
         # ? end draw origin
 

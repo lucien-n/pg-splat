@@ -77,11 +77,11 @@ class Player(pg.sprite.Sprite):
         if not self.is_grounded:
             self.velocity.y += self.gravity * dt
 
-        if new_pos.y > self.level.game.height - self.rect.h:
+        if new_pos.y > display_height - self.rect.h:
             self.is_grounded = True
             self.jump_counter = 0
             self.velocity.y = 0
-            new_pos.y = self.level.game.height - self.rect.h
+            new_pos.y = display_height - self.rect.h
 
         self.is_running = self.velocity.x != 0
 

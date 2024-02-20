@@ -10,16 +10,10 @@ class Game:
     pg.init()
 
     def __init__(self, vsync=False) -> None:
-        self.win_size = self.win_width, self.win_height = (1280, 720)
-        self.size = self.width, self.height = (
-            320 / settings["camera"]["zoom"],
-            180 / settings["camera"]["zoom"],
-        )
-
-        self.window = pg.display.set_mode(self.win_size, vsync=vsync)
+        self.window = pg.display.set_mode(window_size, vsync=vsync)
         self.clock = pg.time.Clock()
 
-        self.target = surface(self.size)
+        self.target = surface(display_size)
 
         self.now = 0
         self.dt = 0
@@ -67,7 +61,7 @@ class Game:
 
         self.level.draw(self.target)
 
-        pg.transform.scale(self.target, self.win_size, self.window)
+        pg.transform.scale(self.target, window_size, self.window)
 
         self.hud.draw(self.window)
 
