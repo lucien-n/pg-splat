@@ -3,11 +3,11 @@ from .utils import apply_scroll
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game, x: float, y: float) -> None:
+    def __init__(self, level, x: float, y: float) -> None:
         super().__init__()
-        from .main import Game
+        from .levels.level import Level
 
-        self.game: Game = game
+        self.level: Level = level
 
         self.rect = pg.FRect(0, 0, 32, 32)
         self.rect.x = x
@@ -63,11 +63,11 @@ class Player(pg.sprite.Sprite):
         if ord(self.movement_binds["jump"]) in self.keys:
             if self.is_grounded or (
                 self.jump_counter < self.max_jumps
-                and self.game.now - self.last_jump_at > self.jump_cooldown
+                and self.level.game.now - self.last_jump_at > self.jump_cooldown
             ):
                 self.is_grounded = False
                 self.jump_counter += 1
-                self.last_jump_at = self.game.now
+                self.last_jump_at = self.level.game.now
                 self.velocity.y = -self.jump_force
 
         new_pos = vector(
@@ -77,11 +77,11 @@ class Player(pg.sprite.Sprite):
         if not self.is_grounded:
             self.velocity.y += self.gravity * dt
 
-        if new_pos.y > self.game.height - self.rect.h:
+        if new_pos.y > self.level.game.height - self.rect.h:
             self.is_grounded = True
             self.jump_counter = 0
             self.velocity.y = 0
-            new_pos.y = self.game.height - self.rect.h
+            new_pos.y = self.level.game.height - self.rect.h
 
         self.is_running = self.velocity.x != 0
 
@@ -102,10 +102,16 @@ class Player(pg.sprite.Sprite):
             else:
                 self.sprite = self.sprites["jump"]
 
+        self.level.game.hud.debug_lines["pos"] = {
+            "label": "\u0040",
+            "value": f"{self.rect.x:.1f} {self.rect.y:.1f}",
+            "bg_color": (69, 92, 123),
+        }
+
     def draw(self, target: surface, scroll: vector):
-        if self.game.now - self.last_frame_at > self.frame_interval:
+        if self.level.game.now - self.last_frame_at > self.frame_interval:
             self.current_frame += 1
-            self.last_frame_at = self.game.now
+            self.last_frame_at = self.level.game.now
 
         if self.current_frame + 1 > self.sprite.get_width() / self.rect.w:
             self.current_frame = 0

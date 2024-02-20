@@ -41,12 +41,6 @@ class Hud:
             "bg_color": (218, 113, 127),
         }
 
-        self.debug_lines["pos"] = {
-            "label": "\u0040",
-            "value": f"{self.game.player.rect.x:.1f} {self.game.player.rect.y:.1f}",
-            "bg_color": (69, 92, 123),
-        }
-
         self.redraw()
 
     def redraw(self):
