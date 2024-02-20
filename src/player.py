@@ -36,8 +36,9 @@ class Player(pg.sprite.Sprite):
         }
         self.animation_sprite = self.sprites["idle"]
         self.image = pg.Surface((32, 32))
-        self.image.fill(Color.BLACK)
         self.image.set_colorkey(Color.BLACK)
+        self.mask = pg.mask.from_surface(self.image)
+        self.draw_outline = False
 
         self.last_frame_at = 0
         self.frame_interval = 1 / 20
@@ -59,14 +60,12 @@ class Player(pg.sprite.Sprite):
                 self.keys.remove(e.key)
 
     def collide(self, new_pos: vector, colliders: list[pg.Rect]):
-        mask = pg.mask.from_surface(self.image)
-
         for collider in colliders:
             collider_surface = pg.Surface(collider.size)
             collider_surface.fill(Color.WHITE)
             collider_mask = pg.mask.from_surface(collider_surface)
 
-            overlap_mask = mask.overlap(
+            overlap = self.mask.overlap(
                 collider_mask,
                 (
                     collider.x - new_pos.x,
@@ -74,12 +73,9 @@ class Player(pg.sprite.Sprite):
                 ),
             )
 
-            if overlap_mask:
-                collided_pos = new_pos
+            if overlap:
 
-                print(overlap_mask)
-
-                return collided_pos
+                return new_pos
 
         return new_pos
 
@@ -152,6 +148,7 @@ class Player(pg.sprite.Sprite):
         self.image = (
             pg.transform.flip(self.image, True, False) if self.flipped else self.image
         )
+        self.mask = pg.mask.from_surface(self.image)
 
         # debug pos
         self.level.game.hud.debug_lines["pos"] = {
@@ -164,10 +161,22 @@ class Player(pg.sprite.Sprite):
         target.blit(self.image, (display_width - self.rect.w, 0))
 
         if self.show_masks:
-            mask = pg.mask.from_surface(self.image)
             target.blit(
-                mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255, 255)),
+                self.mask.to_surface(
+                    unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255, 255)
+                ),
                 apply_scroll(self.rect, scroll),
             )
         else:
             target.blit(self.image, apply_scroll(self.rect, scroll))
+
+        if self.draw_outline:
+            pg.draw.lines(
+                target,
+                Color.WHITE,
+                False,
+                [
+                    (x + self.rect.x - scroll.x, y + self.rect.y - scroll.y)
+                    for x, y in self.mask.outline(every=1)
+                ],
+            )
