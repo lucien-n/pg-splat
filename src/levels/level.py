@@ -16,5 +16,5 @@ class Level:
     def fixed_update(self, dt: float):
         pass
 
-    def draw(self, target: surface):
+    def draw(self, target: pg.Surface):
         pass

@@ -55,7 +55,7 @@ class Hud:
             )
             self.rendered_lines.append(rendered_line)
 
-    def draw(self, surface: surface, *args):
+    def draw(self, surface: pg.Surface, *args):
         h = 0
         for rendered_line in self.rendered_lines:
             surface.blit(rendered_line, (0, h))
@@ -68,7 +68,7 @@ class Hud:
         color: tuple = (255, 255, 255),
         bgcolor: tuple = None,
         padding: int = 4,
-    ) -> surface:
+    ) -> pg.Surface:
         """Render text with font
 
         Args:
@@ -85,7 +85,7 @@ class Hud:
             str(content), color, None, pgft.STYLE_DEFAULT, 0, size
         )[0]
 
-        padded_rendered_text = surface(
+        padded_rendered_text = pg.Surface(
             (
                 rendered_text.get_width() + padding * 2,
                 rendered_text.get_height() + padding * 2,

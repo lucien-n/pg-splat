@@ -7,7 +7,7 @@ class Camera:
         self.scroll = vector(0, 0)
         self.follow: pg.Rect = None
 
-    def update(self, target: surface):
+    def update(self, target: pg.Surface):
         if (
             self.follow.x - (self.follow.w / 2) - self.scroll.x
             != target.get_width() / 2

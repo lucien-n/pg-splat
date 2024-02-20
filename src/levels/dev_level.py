@@ -20,6 +20,8 @@ class DevLevel(Level):
         self.tiles = [
             Tile(0, 4),
             Tile(3, 5),
+            Tile(4, 5),
+            Tile(5, 5),
             Tile(1, 3),
             Tile(6, 3),
         ]  # , Tile(1, 4), Tile(2, 4), Tile(5, 2)
@@ -28,12 +30,12 @@ class DevLevel(Level):
         self.player.handle_events(events)
 
     def update(self, dt: float):
-        self.player.update(dt, [tile.rect for tile in self.tiles])
+        self.player.update(dt, self.tiles)
 
     def fixed_update(self, dt: float):
         self.player.fixed_update(dt)
 
-    def draw(self, target: surface):
+    def draw(self, target: pg.Surface):
         self.camera.update(target)
 
         # ? draw origin

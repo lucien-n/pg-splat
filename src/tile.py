@@ -1,15 +1,20 @@
 from .settings import *
+from .sprite import Sprite
 from .utils import apply_scroll
 
 
-class Tile(pg.sprite.Sprite):
+class Tile(Sprite):
     def __init__(self, x: float, y: float) -> None:
-        self.pos = vector(x, y)
-
-        self.image = pg.image.load("assets/tiles/debug.png").convert()
+        super().__init__(
+            vector(x, y), pg.image.load("assets/tiles/debug.png").convert()
+        )
         self.rect = self.image.get_rect()
         self.rect.x = x * self.rect.w
         self.rect.y = y * self.rect.h
+        self.old_rect = self.rect.copy()
 
-    def draw(self, target: surface, scroll: vector):
+    def update(self):
+        self.old_rect = self.rect.copy()
+
+    def draw(self, target: pg.Surface, scroll: vector):
         target.blit(self.image, apply_scroll(self.rect, scroll))

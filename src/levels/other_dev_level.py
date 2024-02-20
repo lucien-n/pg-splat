@@ -28,7 +28,7 @@ class OtherDevLevel(Level):
     def fixed_update(self, dt: float):
         self.player.fixed_update(dt)
 
-    def draw(self, target: surface):
+    def draw(self, target: pg.Surface):
         self.camera.update(target)
 
         # ? draw origin

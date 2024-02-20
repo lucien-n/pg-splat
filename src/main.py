@@ -14,7 +14,7 @@ class Game:
         self.window = pg.display.set_mode(window_size, vsync=vsync)
         self.clock = pg.time.Clock()
 
-        self.target = surface(display_size)
+        self.target = pg.Surface(display_size)
 
         self.now = 0
         self.dt = 0

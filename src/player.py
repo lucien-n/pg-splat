@@ -1,24 +1,22 @@
+from .tile import Tile
 from .settings import *
+from .sprite import Sprite
 from .utils import apply_scroll
 
 
-class Player(pg.sprite.Sprite):
+class Player(Sprite):
     def __init__(self, level, x: float, y: float) -> None:
-        super().__init__()
+        super().__init__((x, y))
         from .levels.level import Level
 
         self.level: Level = level
-
-        self.rect = pg.FRect(0, 0, 32, 32)
-        self.rect.topleft = (x, y)
-        self.old_rect = self.rect.copy()
 
         self.speed = 140
         self.jump_force = 320
         self.gravity = 1200
 
         self.direction = vector(0, 0)
-        self.is_grounded = False
+        self.jump = False
         self.jump_counter = 0
         self.max_jumps = 9999 if DEV else 2
         self.jump_cooldown = 1 / 5  # ? cooldown or on spacebar repress
@@ -54,44 +52,77 @@ class Player(pg.sprite.Sprite):
 
         if keys[ord(self.movement_binds["left"])]:
             input_vector.x -= 1
+            self.flipped = True
+
         if keys[ord(self.movement_binds["right"])]:
             input_vector.x += 1
+            self.flipped = False
 
-        self.direction = input_vector.normalize() if input_vector else input_vector
+        if keys[ord(self.movement_binds["jump"])]:
+            self.jump = True
 
-    def collide(self, axis, colliders: list[pg.Rect]):
-        for collider in colliders:
-            if collider.colliderect(self.rect):
+        self.direction.x = (
+            input_vector.normalize().x if input_vector else input_vector.x
+        )
+
+    def collide(self, axis, tiles: list[Tile]):
+        for tile in tiles:
+            if tile.rect.colliderect(self.rect):
                 if axis == "horizontal":
                     # left
-                    if (
-                        self.rect.left <= collider.right
-                        and self.old_rect.left >= collider.right
-                    ):  # todo: old collider rect
-                        self.rect.left = collider.right
+                    if self.rect.left <= tile.rect.right and int(
+                        self.old_rect.left
+                    ) >= int(tile.old_rect.right):
+                        self.rect.left = tile.rect.right
 
                     # right
-                    if (
-                        self.rect.right >= collider.left
-                        and self.old_rect.right <= collider.left
-                    ):  # todo: old collider rect
-                        self.rect.right = collider.left
+                    if self.rect.right >= tile.rect.left and int(
+                        self.old_rect.right
+                    ) <= int(tile.old_rect.left):
+                        self.rect.right = tile.rect.left
                 else:
-                    pass
+                    # top
+                    if self.rect.top <= tile.rect.bottom and int(
+                        self.old_rect.top
+                    ) >= int(tile.old_rect.bottom):
+                        self.rect.top = tile.rect.bottom
 
-    def move(self, dt: float, colliders: list[pg.Rect]):
+                    # bottom
+                    if self.rect.bottom >= tile.rect.top and int(
+                        self.old_rect.bottom
+                    ) <= int(tile.old_rect.top):
+                        self.rect.bottom = tile.rect.top
+
+                    self.direction.y = 0
+                    self.jump_counter = 0
+
+    def move(self, dt: float, tiles: list[Tile]):
+        # horizontal
         self.rect.x += self.direction.x * self.speed * dt
-        self.collide("horizontal", colliders)
+        self.collide("horizontal", tiles)
 
-        self.rect.y += self.direction.y * self.speed * dt
-        self.collide("vertical", colliders)
+        # vertical
+        self.direction.y += self.gravity / 2 * dt
+        self.rect.y += self.direction.y * dt
+        self.direction.y += self.gravity / 2 * dt
+        self.collide("vertical", tiles)
 
-    def update(self, dt: float = 0, colliders: list[pg.Rect] = []):
+        if self.jump:
+            if (
+                self.level.game.now - self.last_jump_at > self.jump_cooldown
+                and self.jump_counter < self.max_jumps
+            ):
+                self.jump_counter += 1
+
+                self.direction.y = -self.jump_force
+                self.last_jump_at = self.level.game.now
+            self.jump = False
+
+    def update(self, dt: float = 0, tiles: list[Tile] = []):
         self.old_rect = self.rect.copy()
-        self.move(dt, colliders)
+        self.move(dt, tiles)
 
     def fixed_update(self, dt: float = 0):
-
         # debug pos
         self.level.game.hud.debug_lines["pos"] = {
             "label": "\u0040",
@@ -100,7 +131,6 @@ class Player(pg.sprite.Sprite):
         }
 
     def animate(self):
-        self.flipped = self.direction.x < 0
         is_running = self.direction.x != 0
         is_falling = self.direction.y > 0
         is_ascending = self.direction.y < 0
@@ -133,7 +163,7 @@ class Player(pg.sprite.Sprite):
         )
         self.mask = pg.mask.from_surface(self.image)
 
-    def draw(self, target: surface, scroll: vector):
+    def draw(self, target: pg.Surface, scroll: vector):
         self.animate()
 
         target.blit(self.image, (display_width - self.rect.w, 0))
