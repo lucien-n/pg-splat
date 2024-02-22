@@ -21,6 +21,7 @@ class Player(Sprite):
         self.max_jumps = 9999 if DEV else 2
         self.jump_cooldown = 1 / 5  # ? cooldown or on spacebar repress
         self.last_jump_at = 0
+        self.is_grounded = False
 
         self.sprites = {
             "idle": pg.image.load("assets/player/idle.png").convert_alpha(),
@@ -65,41 +66,50 @@ class Player(Sprite):
             input_vector.normalize().x if input_vector else input_vector.x
         )
 
-    def collide(self, axis, tiles: list[Tile]):
+    def land(self):
+        self.jump_counter = 0
+        self.is_grounded = True
+        self.direction.y = 0
+
+    def collide(self, tiles: list[Tile]):
         for tile in tiles:
-            if tile.rect.colliderect(self.hit_rect):
-                if axis == "horizontal":
-                    # left
-                    if self.hit_rect.left <= tile.rect.right and int(
-                        self.old_rect.left
-                    ) >= int(tile.old_rect.right):
-                        self.hit_rect.left = tile.rect.right
+            if (
+                self.hit_rect.bottom < tile.rect.top
+                or self.hit_rect.top > tile.rect.bottom
+                or self.hit_rect.left > tile.rect.right
+                or self.hit_rect.right < tile.rect.left
+            ):
+                continue
 
-                    # right
-                    if self.hit_rect.right >= tile.rect.left and int(
-                        self.old_rect.right
-                    ) <= int(tile.old_rect.left):
-                        self.hit_rect.right = tile.rect.left
-                else:
-                    # top
-                    if self.hit_rect.top <= tile.rect.bottom and int(
-                        self.old_rect.top
-                    ) >= int(tile.old_rect.bottom):
-                        self.hit_rect.top = tile.rect.bottom
+            # bottom
+            if (
+                self.hit_rect.bottom >= tile.rect.top
+                and self.old_rect.bottom < tile.old_rect.top
+            ):
+                self.hit_rect.bottom = tile.rect.top - 0.1
+                self.land()
+            # top
+            elif (
+                self.hit_rect.top <= tile.rect.bottom
+                and self.old_rect.top > tile.old_rect.bottom
+            ):
+                self.hit_rect.top = tile.rect.bottom + 0.1
+            # right
+            elif (
+                self.hit_rect.right >= tile.rect.left
+                and self.old_rect.right < tile.old_rect.left
+            ):
+                self.hit_rect.right = tile.rect.left - 0.1
+            # left
+            elif (
+                self.hit_rect.left <= tile.rect.right
+                and self.old_rect.left > tile.old_rect.right
+            ):
+                self.hit_rect.left = tile.rect.right + 0.1
 
-                    # bottom
-                    if self.hit_rect.bottom >= tile.rect.top and int(
-                        self.old_rect.bottom
-                    ) <= int(tile.old_rect.top):
-                        self.hit_rect.bottom = tile.rect.top
-
-                    self.direction.y = 0
-                    self.jump_counter = 0
-
-    def move(self, dt: float, tiles: list[Tile]):
+    def move(self, dt: float):
         # horizontal
         self.hit_rect.x += self.direction.x * self.speed * dt
-        self.collide("horizontal", tiles)
 
         # vertical
         self.direction.y += self.gravity / 2 * dt
@@ -111,17 +121,18 @@ class Player(Sprite):
                 self.level.game.now - self.last_jump_at > self.jump_cooldown
                 and self.jump_counter < self.max_jumps
             ):
+                self.is_grounded = False
                 self.jump_counter += 1
 
                 self.direction.y = -self.jump_force
                 self.last_jump_at = self.level.game.now
             self.jump = False
 
-        self.collide("vertical", tiles)
-
     def update(self, dt: float = 0, tiles: list[Tile] = []):
         self.old_rect = self.hit_rect.copy()
-        self.move(dt, tiles)
+
+        self.move(dt)
+        self.collide(tiles)
 
         self.rect.topleft = (
             self.hit_rect.x - 6,
@@ -136,10 +147,22 @@ class Player(Sprite):
             "bg_color": (69, 92, 123),
         }
 
+        self.level.game.hud.debug_lines["direction"] = {
+            "label": "V",
+            "value": f"{self.direction.x:.1f} {self.direction.y:.1f}",
+            "bg_color": (80, 50, 200),
+        }
+
+        self.level.game.hud.debug_lines["player_debug"] = {
+            "label": "P",
+            "value": f"{self.is_grounded} {self.jump} {self.jump_counter}",
+            "bg_color": (237, 124, 0),
+        }
+
     def animate(self):
         is_running = self.direction.x != 0
-        is_falling = self.direction.y > 0
-        is_ascending = self.direction.y < 0
+        is_falling = not self.is_grounded and self.direction.y > 0
+        is_ascending = not self.is_grounded and self.direction.y < 0
 
         if is_running:
             self.animation_sprite = self.sprites["run"]
@@ -186,7 +209,7 @@ class Player(Sprite):
                 ],
             )
 
-        scrolled = apply_scroll(self.hit_rect, scroll, "rect")
-        print(scrolled)
         if DRAW_RECTS:
-            pg.draw.rect(target, Color.GREEN, scrolled, 1)
+            pg.draw.rect(
+                target, Color.GREEN, apply_scroll(self.hit_rect, scroll, "rect"), 1
+            )

@@ -4,7 +4,6 @@ import time
 from .hud import Hud
 from .settings import *
 from .levels.dev_level import DevLevel
-from .levels.other_dev_level import OtherDevLevel
 
 
 class Game:
@@ -30,6 +29,7 @@ class Game:
         self.level = DevLevel(self)
 
     def handle_events(self):
+        global DRAW_RECTS
         events = pg.event.get()
 
         for e in events:
@@ -38,8 +38,8 @@ class Game:
             if e.type == pg.KEYDOWN:
                 if e.key == pg.K_ESCAPE:  # !temp
                     self.running = False
-                if e.key == pg.K_l:  # !temp
-                    self.level = OtherDevLevel(self)
+                if e.key == pg.K_m:
+                    DRAW_RECTS = not DRAW_RECTS
 
         self.level.handle_events(events)
 
@@ -70,7 +70,7 @@ class Game:
         self.hud.draw(self.window)
 
         pg.display.update()
-        self.clock.tick()
+        self.clock.tick(60)
 
     def run(self):
         self.prev_time = time.time()  # avoids out of world dt on first frame
