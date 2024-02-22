@@ -70,7 +70,7 @@ class Game:
         self.hud.draw(self.window)
 
         pg.display.update()
-        self.clock.tick()
+        self.clock.tick(TARGET_FPS)
 
     def run(self):
         self.prev_time = time.time()  # avoids out of world dt on first frame

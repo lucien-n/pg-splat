@@ -4,7 +4,7 @@ import pygame as pg
 from pygame.math import Vector2 as vector
 
 settings = {
-    "camera": {"smoothness": 36, "zoom": 0.5},
+    "camera": {"smoothness": 180},
     "keybinds": {"movements": {"jump": " ", "right": "d", "left": "a"}},
 }
 
@@ -13,6 +13,7 @@ display_size = display_width, display_height = 320, 180
 
 DEV = True
 DRAW_RECTS = DEV
+TARGET_FPS = 165
 
 
 class Color:

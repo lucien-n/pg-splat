@@ -36,7 +36,7 @@ class DevLevel(Level):
         self.player.fixed_update(dt)
 
     def draw(self, target: pg.Surface):
-        self.camera.update(target)
+        self.camera.update(target, self.game.dt)
 
         # ? draw origin
         pg.draw.line(
