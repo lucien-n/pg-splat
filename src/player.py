@@ -105,7 +105,6 @@ class Player(Sprite):
         self.direction.y += self.gravity / 2 * dt
         self.rect.y += self.direction.y * dt
         self.direction.y += self.gravity / 2 * dt
-        self.collide("vertical", tiles)
 
         if self.jump:
             if (
@@ -117,6 +116,8 @@ class Player(Sprite):
                 self.direction.y = -self.jump_force
                 self.last_jump_at = self.level.game.now
             self.jump = False
+
+        self.collide("vertical", tiles)
 
     def update(self, dt: float = 0, tiles: list[Tile] = []):
         self.old_rect = self.rect.copy()
