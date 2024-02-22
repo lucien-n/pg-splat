@@ -69,7 +69,18 @@ class Player(Sprite):
     def land(self):
         self.jump_counter = 0
         self.is_grounded = True
-        self.direction.y = 0
+        if not self.jump:
+            self.direction.y = 0
+
+    def apply_gravity(self, dt: float):
+        self.direction.y += self.gravity / 2 * dt
+        self.hit_rect.y += self.direction.y * dt
+        self.direction.y += self.gravity / 2 * dt
+
+        if self.direction.y > 5_000:
+            self.direction.y = 5_000
+        if self.direction.y < -5_000:
+            self.direction.y = -5_000
 
     def collide(self, tiles: list[Tile]):
         for tile in tiles:
@@ -112,9 +123,7 @@ class Player(Sprite):
         self.hit_rect.x += self.direction.x * self.speed * dt
 
         # vertical
-        self.direction.y += self.gravity / 2 * dt
-        self.hit_rect.y += self.direction.y * dt
-        self.direction.y += self.gravity / 2 * dt
+        self.apply_gravity(dt)
 
         if self.jump:
             if (
@@ -134,6 +143,7 @@ class Player(Sprite):
         self.move(dt)
         self.collide(tiles)
 
+        self.hit_rect.y = int(self.hit_rect.y)
         self.rect.topleft = (
             self.hit_rect.x - 6,
             self.hit_rect.y - 8,
@@ -143,20 +153,20 @@ class Player(Sprite):
         # debug pos
         self.level.game.hud.debug_lines["pos"] = {
             "label": "\u0040",
-            "value": f"{self.rect.x:.1f} {self.rect.y:.1f}",
+            "value": f"{self.rect.x:.1f} {self.rect.y:.1f} | {self.hit_rect.x:.1f} {self.hit_rect.y:.1f} ",
             "bg_color": (69, 92, 123),
         }
 
         self.level.game.hud.debug_lines["direction"] = {
             "label": "V",
             "value": f"{self.direction.x:.1f} {self.direction.y:.1f}",
-            "bg_color": (80, 50, 200),
+            "bg_color": (80, 150, 150),
         }
 
         self.level.game.hud.debug_lines["player_debug"] = {
             "label": "P",
             "value": f"{self.is_grounded} {self.jump} {self.jump_counter}",
-            "bg_color": (237, 124, 0),
+            "bg_color": (180, 124, 170),
         }
 
     def animate(self):
