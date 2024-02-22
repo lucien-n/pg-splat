@@ -29,7 +29,6 @@ class Game:
         self.level = DevLevel(self)
 
     def handle_events(self):
-        global DRAW_RECTS
         events = pg.event.get()
 
         for e in events:
@@ -38,8 +37,6 @@ class Game:
             if e.type == pg.KEYDOWN:
                 if e.key == pg.K_ESCAPE:  # !temp
                     self.running = False
-                if e.key == pg.K_m:
-                    DRAW_RECTS = not DRAW_RECTS
 
         self.level.handle_events(events)
 
