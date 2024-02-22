@@ -12,6 +12,7 @@ window_size = window_width, window_height = 1280, 720
 display_size = display_width, display_height = 320, 180
 
 DEV = True
+DRAW_RECTS = DEV
 
 
 class Color:

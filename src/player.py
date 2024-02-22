@@ -44,7 +44,7 @@ class Player(Sprite):
 
         self.movement_binds = settings["keybinds"]["movements"]
 
-        self.show_masks = False
+        self.hit_rect = self.rect.inflate(-12, -8)
 
     def handle_events(self, events: list[pg.Event]):
         keys = pg.key.get_pressed()
@@ -67,43 +67,43 @@ class Player(Sprite):
 
     def collide(self, axis, tiles: list[Tile]):
         for tile in tiles:
-            if tile.rect.colliderect(self.rect):
+            if tile.rect.colliderect(self.hit_rect):
                 if axis == "horizontal":
                     # left
-                    if self.rect.left <= tile.rect.right and int(
+                    if self.hit_rect.left <= tile.rect.right and int(
                         self.old_rect.left
                     ) >= int(tile.old_rect.right):
-                        self.rect.left = tile.rect.right
+                        self.hit_rect.left = tile.rect.right
 
                     # right
-                    if self.rect.right >= tile.rect.left and int(
+                    if self.hit_rect.right >= tile.rect.left and int(
                         self.old_rect.right
                     ) <= int(tile.old_rect.left):
-                        self.rect.right = tile.rect.left
+                        self.hit_rect.right = tile.rect.left
                 else:
                     # top
-                    if self.rect.top <= tile.rect.bottom and int(
+                    if self.hit_rect.top <= tile.rect.bottom and int(
                         self.old_rect.top
                     ) >= int(tile.old_rect.bottom):
-                        self.rect.top = tile.rect.bottom
+                        self.hit_rect.top = tile.rect.bottom
 
                     # bottom
-                    if self.rect.bottom >= tile.rect.top and int(
+                    if self.hit_rect.bottom >= tile.rect.top and int(
                         self.old_rect.bottom
                     ) <= int(tile.old_rect.top):
-                        self.rect.bottom = tile.rect.top
+                        self.hit_rect.bottom = tile.rect.top
 
                     self.direction.y = 0
                     self.jump_counter = 0
 
     def move(self, dt: float, tiles: list[Tile]):
         # horizontal
-        self.rect.x += self.direction.x * self.speed * dt
+        self.hit_rect.x += self.direction.x * self.speed * dt
         self.collide("horizontal", tiles)
 
         # vertical
         self.direction.y += self.gravity / 2 * dt
-        self.rect.y += self.direction.y * dt
+        self.hit_rect.y += self.direction.y * dt
         self.direction.y += self.gravity / 2 * dt
 
         if self.jump:
@@ -120,8 +120,13 @@ class Player(Sprite):
         self.collide("vertical", tiles)
 
     def update(self, dt: float = 0, tiles: list[Tile] = []):
-        self.old_rect = self.rect.copy()
+        self.old_rect = self.hit_rect.copy()
         self.move(dt, tiles)
+
+        self.rect.topleft = (
+            self.hit_rect.x - 6,
+            self.hit_rect.y - 8,
+        )  # adjust based on rect inflation
 
     def fixed_update(self, dt: float = 0):
         # debug pos
@@ -168,16 +173,7 @@ class Player(Sprite):
         self.animate()
 
         target.blit(self.image, (display_width - self.rect.w, 0))
-
-        if self.show_masks:
-            target.blit(
-                self.mask.to_surface(
-                    unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255, 255)
-                ),
-                apply_scroll(self.rect, scroll),
-            )
-        else:
-            target.blit(self.image, apply_scroll(self.rect, scroll))
+        target.blit(self.image, apply_scroll(self.rect, scroll))
 
         if self.draw_outline:
             pg.draw.lines(
@@ -189,3 +185,8 @@ class Player(Sprite):
                     for x, y in self.mask.outline(every=1)
                 ],
             )
+
+        scrolled = apply_scroll(self.hit_rect, scroll, "rect")
+        print(scrolled)
+        if DRAW_RECTS:
+            pg.draw.rect(target, Color.GREEN, scrolled, 1)
