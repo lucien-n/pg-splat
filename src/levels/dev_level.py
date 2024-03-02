@@ -20,6 +20,7 @@ class DevLevel(Level):
         self.tiles = [
             Tile(0, 4),
             Tile(3, 5),
+            Tile(2, 4),
             Tile(4, 5),
             Tile(5, 5),
             Tile(1, 3),
