@@ -220,3 +220,6 @@ class Player(Sprite):
             pg.draw.rect(
                 target, Color.GREEN, apply_scroll(self.hit_rect, scroll, "rect"), 1
             )
+            pg.draw.rect(
+                target, Color.RED, apply_scroll(self.old_rect, scroll, "rect"), 1
+            )
