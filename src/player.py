@@ -91,7 +91,7 @@ class Player(Sprite):
             # top
             elif (
                 self.hit_rect.top <= tile.rect.bottom
-                and self.old_rect.top > tile.old_rect.bottom
+                and self.old_rect.top >= tile.old_rect.bottom
             ):
                 self.hit_rect.top = tile.rect.bottom + 0.1
             # right
