@@ -24,6 +24,14 @@ class Player(Sprite):
         self.last_jump_at = 0
         self.is_grounded = False
 
+        self.image = pg.Surface((32, 32))
+        self.image.set_colorkey(Color.BLACK)
+        self.rect = self.image.get_frect(topleft=(x, y))
+        self.mask = pg.mask.from_surface(self.image)
+
+        self.draw_outline = False
+        self.flipped = False
+
         self.sprites = {
             "idle": pg.image.load("assets/player/idle.png").convert_alpha(),
             "run": pg.image.load("assets/player/run.png").convert_alpha(),
@@ -34,12 +42,6 @@ class Player(Sprite):
             "fall": pg.image.load("assets/player/fall.png").convert_alpha(),
         }
         self.animation_sprite = self.sprites["idle"]
-        self.image = pg.Surface((32, 32))
-        self.image.set_colorkey(Color.BLACK)
-        self.rect = self.image.get_frect()
-        self.mask = pg.mask.from_surface(self.image)
-        self.draw_outline = False
-        self.flipped = False
 
         self.last_frame_at = 0
         self.frame_interval = 1 / 20
