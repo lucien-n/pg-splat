@@ -4,10 +4,8 @@ from .utils import apply_scroll
 
 
 class Tile(Sprite):
-    def __init__(self, x: float, y: float) -> None:
-        super().__init__(
-            vector(x, y), pg.image.load("assets/tiles/debug.png").convert()
-        )
+    def __init__(self, x: float, y: float, surf: pg.Surface) -> None:
+        super().__init__(vector(x, y), surf)
         self.rect = self.image.get_rect()
         self.rect.x = x * self.rect.w
         self.rect.y = y * self.rect.h

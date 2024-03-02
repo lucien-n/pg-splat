@@ -4,7 +4,10 @@ from .settings import *
 
 class Sprite(pg.sprite.Sprite):
     def __init__(
-        self, position: vector, surface: pg.Surface = pg.Surface((32, 32)), groups=[]
+        self,
+        position: vector,
+        surface: pg.Surface = pg.Surface((TILE_SIZE, TILE_SIZE)),
+        *groups,
     ) -> None:
         super().__init__(groups)
 

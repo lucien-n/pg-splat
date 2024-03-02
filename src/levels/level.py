@@ -1,6 +1,7 @@
-from PIL import Image
 from ..tile import Tile
 from ..settings import *
+from ..player import Player
+from pytmx.util_pygame import load_pygame
 
 
 class Level:
@@ -10,19 +11,18 @@ class Level:
         self.game: Game = game
         self.name = name
 
-        self.tiles: list[Tile] = []
-        self.spawn_point = vector(0, 0)
-        self.load(f"assets/levels/{self.name}.png")
+        self.tiles = []
+        self.player: Player | None = None
+        self.load()
 
-    def load(self, path: str):
-        img = Image.open(path)
-        for y in range(img.height):
-            for x in range(img.width):
-                pixel = img.getpixel((x, y))
-                if pixel == 0:
-                    self.tiles.append(Tile(x, y))
-                if pixel == 3:
-                    self.spawn_point = vector(x * 32, y * 32)
+    def load(self):
+        map = load_pygame(f"assets/levels/{self.name}.tmx")
+        for x, y, surf in map.get_layer_by_name("walls").tiles():
+            self.tiles.append(Tile(x, y, surf))
+
+        for obj in map.get_layer_by_name("objects"):
+            if obj.name == "player":
+                self.player = Player(self, obj.x, obj.y)
 
     def handle_events(self, events: list[pg.Event]):
         pass

@@ -1,4 +1,3 @@
-from ..tile import Tile
 from .level import Level
 from ..settings import *
 from ..camera import Camera
@@ -13,11 +12,8 @@ class DevLevel(Level):
         self.game: Game = game
 
         self.camera = Camera()
-
-        self.player = Player(self, self.spawn_point.x, self.spawn_point.y)
         self.camera.follow = self.player.rect
 
-        
     def handle_events(self, events: list[pg.Event]):
         self.player.handle_events(events)
 

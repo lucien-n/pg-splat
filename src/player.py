@@ -6,7 +6,7 @@ from .utils import apply_scroll
 
 class Player(Sprite):
     def __init__(self, level, x: float, y: float) -> None:
-        super().__init__((x, y))
+        super().__init__(vector(x, y))
         from .levels.level import Level
 
         self.level: Level = level
@@ -36,6 +36,7 @@ class Player(Sprite):
         self.animation_sprite = self.sprites["idle"]
         self.image = pg.Surface((32, 32))
         self.image.set_colorkey(Color.BLACK)
+        self.rect = self.image.get_frect()
         self.mask = pg.mask.from_surface(self.image)
         self.draw_outline = False
         self.flipped = False
