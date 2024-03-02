@@ -15,7 +15,8 @@ class Player(Sprite):
         self.jump_force = 320
         self.gravity = 1200
 
-        self.direction = vector(0, 0)
+        self.velocity = vector(0, 0)
+        self.max_velocity = 5000
         self.jump = False
         self.jump_counter = 0
         self.max_jumps = 9999 if DEV else 2
@@ -62,25 +63,13 @@ class Player(Sprite):
         if keys[ord(self.movement_binds["jump"])]:
             self.jump = True
 
-        self.direction.x = (
-            input_vector.normalize().x if input_vector else input_vector.x
-        )
+        self.velocity.x = input_vector.normalize().x if input_vector else input_vector.x
 
     def land(self):
         self.jump_counter = 0
         self.is_grounded = True
         if not self.jump:
-            self.direction.y = 0
-
-    def apply_gravity(self, dt: float):
-        self.direction.y += self.gravity / 2 * dt
-        self.hit_rect.y += self.direction.y * dt
-        self.direction.y += self.gravity / 2 * dt
-
-        if self.direction.y > 5_000:
-            self.direction.y = 5_000
-        if self.direction.y < -5_000:
-            self.direction.y = -5_000
+            self.velocity.y = 0
 
     def collide(self, tiles: list[Tile]):
         for tile in tiles:
@@ -120,10 +109,18 @@ class Player(Sprite):
 
     def move(self, dt: float):
         # horizontal
-        self.hit_rect.x += self.direction.x * self.speed * dt
+        self.hit_rect.x += self.velocity.x * self.speed * dt
+        self.velocity.x = pg.math.clamp(
+            self.velocity.x, -self.max_velocity, self.max_velocity
+        )
 
         # vertical
-        self.apply_gravity(dt)
+        self.velocity.y += self.gravity / 2 * dt
+        self.hit_rect.y += self.velocity.y * dt
+        self.velocity.y += self.gravity / 2 * dt
+        self.velocity.y = pg.math.clamp(
+            self.velocity.y, -self.max_velocity, self.max_velocity
+        )
 
         if self.jump:
             if (
@@ -133,7 +130,7 @@ class Player(Sprite):
                 self.is_grounded = False
                 self.jump_counter += 1
 
-                self.direction.y = -self.jump_force
+                self.velocity.y = -self.jump_force
                 self.last_jump_at = self.level.game.now
             self.jump = False
 
@@ -149,7 +146,7 @@ class Player(Sprite):
             self.hit_rect.y - 8,
         )  # adjust based on rect inflation
 
-    def fixed_update(self, dt: float = 0):
+    def fixed_update(self, dt: float = 0, tiles=[]):
         # debug pos
         self.level.game.hud.debug_lines["pos"] = {
             "label": "\u0040",
@@ -159,7 +156,7 @@ class Player(Sprite):
 
         self.level.game.hud.debug_lines["direction"] = {
             "label": "V",
-            "value": f"{self.direction.x:.1f} {self.direction.y:.1f}",
+            "value": f"{self.velocity.x:.1f} {self.velocity.y:.1f}",
             "bg_color": (80, 150, 150),
         }
 
@@ -170,9 +167,9 @@ class Player(Sprite):
         }
 
     def animate(self):
-        is_running = self.direction.x != 0
-        is_falling = not self.is_grounded and self.direction.y > 0
-        is_ascending = not self.is_grounded and self.direction.y < 0
+        is_running = self.velocity.x != 0
+        is_falling = not self.is_grounded and self.velocity.y > 0
+        is_ascending = not self.is_grounded and self.velocity.y < 0
 
         if is_running:
             self.animation_sprite = self.sprites["run"]
