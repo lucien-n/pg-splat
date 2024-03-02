@@ -94,6 +94,7 @@ class Player(Sprite):
                 and self.old_rect.top >= tile.old_rect.bottom
             ):
                 self.hit_rect.top = tile.rect.bottom + 0.1
+                self.velocity.y = 0
             # right
             elif (
                 self.hit_rect.right >= tile.rect.left
