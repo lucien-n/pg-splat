@@ -163,7 +163,7 @@ class Player(Sprite):
 
         self.level.game.hud.debug_lines["player_debug"] = {
             "label": "P",
-            "value": f"{self.is_grounded} {self.jump} {self.jump_counter}",
+            "value": f"{self.is_grounded} {self.jump_counter}",
             "bg_color": (180, 124, 170),
         }
 
