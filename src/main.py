@@ -10,10 +10,12 @@ class Game:
     pg.init()
 
     def __init__(self, vsync=False) -> None:
-        self.window = pg.display.set_mode(window_size, vsync=vsync)
-        self.clock = pg.time.Clock()
-
+        self.window_size = (settings["display"]["width"], settings["display"]["height"])
+        self.window = pg.display.set_mode(self.window_size, vsync=vsync)
         self.target = pg.Surface(display_size)
+
+        self.clock = pg.time.Clock()
+        self.target_fps = settings["display"]["target_fps"]
 
         self.now = 0
         self.dt = 0
@@ -62,12 +64,12 @@ class Game:
 
         self.level.draw(self.target)
 
-        pg.transform.scale(self.target, window_size, self.window)
+        pg.transform.scale(self.target, self.window_size, self.window)
 
         self.hud.draw(self.window)
 
         pg.display.update()
-        self.clock.tick(TARGET_FPS)
+        self.clock.tick(self.target_fps)
 
     def run(self):
         self.prev_time = time.time()  # avoids out of world dt on first frame
