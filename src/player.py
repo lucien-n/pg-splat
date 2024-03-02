@@ -20,7 +20,7 @@ class Player(Sprite):
         self.jump = False
         self.jump_counter = 0
         self.max_jumps = 9999 if DEV else 2
-        self.jump_cooldown = 1 / 5  # ? cooldown or on spacebar repress
+        self.jump_cooldown = 1 / 4
         self.last_jump_at = 0
         self.is_grounded = False
 
