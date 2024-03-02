@@ -46,7 +46,7 @@ class Player(Sprite):
 
         self.movement_binds = settings["keybinds"]["movements"]
 
-        self.hit_rect = self.rect.inflate(-12, -8)
+        self.hit_rect = self.rect.inflate(-12, -9)
 
     def handle_events(self, events: list[pg.Event]):
         keys = pg.key.get_pressed()
