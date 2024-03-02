@@ -1,0 +1,43 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "levels",
+        ".",
+        "templates"
+    ],
+    "fileStates": {
+        "C:/Users/lucie/Downloads/Super-Pirate-World/data/overworld/overworld.tmx": {
+            "scale": 0.4829166666666666,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 1748.748921484038,
+                "y": 1480.586712683348
+            }
+        },
+        "C:/Users/lucie/Downloads/Super-Pirate-World/data/tilesets/editor_paths.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/lucie/Downloads/Super-Pirate-World/data/tilesets/map objects.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/lucie/Downloads/Super-Pirate-World/data/tilesets/overworld.tsx": {
+            "scaleInDock": 1
+        },
+        "levels/dev.tmx": {
+            "scale": 3,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 269.5,
+                "y": 201
+            }
+        }
+    },
+    "last.objectTemplatePath": "D:/python/pygame/pg-splat/assets/templates",
+    "openFiles": [
+    ],
+    "project": "splat.tiled-project",
+    "property.type": "int",
+    "recentFiles": [
+        "C:/Users/lucie/Downloads/Super-Pirate-World/data/overworld/overworld.tmx"
+    ]
+}

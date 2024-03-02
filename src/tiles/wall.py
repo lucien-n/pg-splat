@@ -1,9 +1,9 @@
-from .settings import *
-from .sprite import Sprite
-from .utils import apply_scroll
+from ..settings import *
+from ..sprite import Sprite
+from ..utils import apply_scroll
 
 
-class Tile(Sprite):
+class Wall(Sprite):
     def __init__(self, x: float, y: float, surf: pg.Surface) -> None:
         super().__init__(vector(x, y), surf)
         self.rect = self.image.get_rect()

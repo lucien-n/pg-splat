@@ -1,7 +1,5 @@
 from .level import Level
 from ..settings import *
-from ..camera import Camera
-from ..player import Player
 
 
 class DevLevel(Level):
@@ -11,20 +9,17 @@ class DevLevel(Level):
 
         self.game: Game = game
 
-        self.camera = Camera()
-        self.camera.follow = self.player.rect
-
     def handle_events(self, events: list[pg.Event]):
-        self.player.handle_events(events)
+        super().handle_events(events)
 
     def update(self, dt: float):
-        self.player.update(dt, self.tiles)
+        super().update(dt)
 
     def fixed_update(self, dt: float):
-        self.player.fixed_update(dt)
+        super().fixed_update(dt)
 
     def draw(self, target: pg.Surface):
-        self.camera.update(target, self.game.dt)
+        super().draw(target)
 
         # ? draw origin
         pg.draw.line(
@@ -41,6 +36,3 @@ class DevLevel(Level):
             vector(-self.camera.scroll.x, display_height),
         )
         # ? end draw origin
-
-        [tile.draw(target, self.camera.scroll) for tile in self.tiles]
-        self.player.draw(target, self.camera.scroll)

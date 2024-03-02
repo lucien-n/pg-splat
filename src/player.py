@@ -1,7 +1,7 @@
-from .tile import Tile
 from .settings import *
 from .sprite import Sprite
 from .utils import apply_scroll
+from .tiles import Wall, Collectible
 
 
 class Player(Sprite):
@@ -28,9 +28,12 @@ class Player(Sprite):
         self.image.set_colorkey(Color.BLACK)
         self.rect = self.image.get_frect(topleft=(x, y))
         self.mask = pg.mask.from_surface(self.image)
+        self.hit_rect = self.rect.inflate(-12, -9)
 
         self.draw_outline = False
         self.flipped = False
+
+        self.movement_binds = settings["keybinds"]["movements"]
 
         self.sprites = {
             "idle": pg.image.load("assets/player/idle.png").convert_alpha(),
@@ -47,9 +50,7 @@ class Player(Sprite):
         self.frame_interval = 1 / 20
         self.current_frame = 0
 
-        self.movement_binds = settings["keybinds"]["movements"]
-
-        self.hit_rect = self.rect.inflate(-12, -9)
+        self.score = 0
 
     def handle_events(self, events: list[pg.Event]):
         keys = pg.key.get_pressed()
@@ -74,42 +75,42 @@ class Player(Sprite):
         if not self.jump:
             self.velocity.y = 0
 
-    def collide(self, tiles: list[Tile]):
-        for tile in tiles:
+    def collide(self, walls: list[Wall]):
+        for wall in walls:
             if (
-                self.hit_rect.bottom < tile.rect.top
-                or self.hit_rect.top > tile.rect.bottom
-                or self.hit_rect.left > tile.rect.right
-                or self.hit_rect.right < tile.rect.left
+                self.hit_rect.bottom < wall.rect.top
+                or self.hit_rect.top > wall.rect.bottom
+                or self.hit_rect.left > wall.rect.right
+                or self.hit_rect.right < wall.rect.left
             ):
                 continue
 
             # bottom
             if (
-                self.hit_rect.bottom >= tile.rect.top
-                and self.old_rect.bottom < tile.old_rect.top
+                self.hit_rect.bottom >= wall.rect.top
+                and self.old_rect.bottom < wall.old_rect.top
             ):
-                self.hit_rect.bottom = tile.rect.top - 0.1
+                self.hit_rect.bottom = wall.rect.top - 0.1
                 self.land()
             # top
             elif (
-                self.hit_rect.top <= tile.rect.bottom
-                and self.old_rect.top >= tile.old_rect.bottom
+                self.hit_rect.top <= wall.rect.bottom
+                and self.old_rect.top >= wall.old_rect.bottom
             ):
-                self.hit_rect.top = tile.rect.bottom + 0.1
+                self.hit_rect.top = wall.rect.bottom + 0.1
                 self.velocity.y = 0
             # right
             elif (
-                self.hit_rect.right >= tile.rect.left
-                and self.old_rect.right < tile.old_rect.left
+                self.hit_rect.right >= wall.rect.left
+                and self.old_rect.right < wall.old_rect.left
             ):
-                self.hit_rect.right = tile.rect.left - 0.1
+                self.hit_rect.right = wall.rect.left - 0.1
             # left
             elif (
-                self.hit_rect.left <= tile.rect.right
-                and self.old_rect.left > tile.old_rect.right
+                self.hit_rect.left <= wall.rect.right
+                and self.old_rect.left > wall.old_rect.right
             ):
-                self.hit_rect.left = tile.rect.right + 0.1
+                self.hit_rect.left = wall.rect.right + 0.1
 
     def move(self, dt: float):
         # horizontal
@@ -138,11 +139,23 @@ class Player(Sprite):
                 self.last_jump_at = self.level.game.now
             self.jump = False
 
-    def update(self, dt: float = 0, tiles: list[Tile] = []):
+    def collide_collectibles(self, collectibles: list[Collectible] = []):
+        for i, collectible in enumerate(collectibles):
+            if collectible.rect.colliderect(self.hit_rect):
+                collectibles.pop(i)
+                self.score += collectible.value
+
+    def update(
+        self,
+        dt: float = 0,
+        walls: list[Wall] = [],
+        collectibles: list[Collectible] = [],
+    ):
         self.old_rect = self.hit_rect.copy()
 
         self.move(dt)
-        self.collide(tiles)
+        self.collide(walls)
+        self.collide_collectibles(collectibles)
 
         self.hit_rect.y = int(self.hit_rect.y)
         self.rect.topleft = (
@@ -168,6 +181,12 @@ class Player(Sprite):
             "label": "P",
             "value": f"{self.is_grounded} {self.jump_counter}",
             "bg_color": (180, 124, 170),
+        }
+
+        self.level.game.hud.debug_lines["player_score"] = {
+            "label": "S",
+            "value": f"{self.score}",
+            "bg_color": (44, 197, 246),
         }
 
     def animate(self):
