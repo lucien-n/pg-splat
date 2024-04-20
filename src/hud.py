@@ -1,6 +1,7 @@
 import numpy as np
 from .settings import *
 import pygame.freetype as pgft
+import typing
 
 
 class Hud:
@@ -60,6 +61,24 @@ class Hud:
         for rendered_line in self.rendered_lines:
             surface.blit(rendered_line, (0, h))
             h += rendered_line.get_height()
+
+    def debug(
+        self,
+        key: str,
+        value: typing.Any,
+        label: str,
+        bg_color: pg.Color | None = None,
+        fg_color: pg.Color | None = None,
+    ):
+        self.debug_lines[key] = {
+            "label": label,
+            "value": str(value),
+        }
+
+        if bg_color:
+            self.debug_lines[key]["bg_color"] = bg_color
+        if fg_color:
+            self.debug_lines[key]["fg_color"] = fg_color
 
     def render_font(
         self,

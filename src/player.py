@@ -10,6 +10,7 @@ class Player(Sprite):
         from .levels.level import Level
 
         self.level: Level = level
+        self.hud = self.level.game.hud
 
         self.speed = 140
         self.jump_force = 320
@@ -160,29 +161,33 @@ class Player(Sprite):
 
     def fixed_update(self, dt: float = 0, tiles=[]):
         # debug pos
-        self.level.game.hud.debug_lines["pos"] = {
-            "label": "\u0040",
-            "value": f"{self.rect.x:.1f} {self.rect.y:.1f} | {self.hit_rect.x:.1f} {self.hit_rect.y:.1f} ",
-            "bg_color": (69, 92, 123),
-        }
+        self.hud.debug(
+            "pos",
+            "\u0040",
+            f"{self.rect.x:.1f} {self.rect.y:.1f} | {self.hit_rect.x:.1f} {self.hit_rect.y:.1f} ",
+            (69, 92, 123),
+        )
 
-        self.level.game.hud.debug_lines["direction"] = {
-            "label": "V",
-            "value": f"{self.velocity.x:.1f} {self.velocity.y:.1f}",
-            "bg_color": (80, 150, 150),
-        }
+        self.hud.debug(
+            "direction",
+            "V",
+            f"{self.velocity.x:.1f} {self.velocity.y:.1f}",
+            (80, 150, 150),
+        )
 
-        self.level.game.hud.debug_lines["player_debug"] = {
-            "label": "P",
-            "value": f"{self.is_grounded} {self.jump_counter}",
-            "bg_color": (180, 124, 170),
-        }
+        self.hud.debug(
+            "player_debug",
+            "P",
+            f"{self.is_grounded} {self.jump_counter}",
+            (180, 124, 170),
+        )
 
-        self.level.game.hud.debug_lines["player_score"] = {
-            "label": "S",
-            "value": f"{self.score}",
-            "bg_color": (44, 197, 246),
-        }
+        self.hud.debug(
+            "player_score",
+            "S",
+            f"{self.score}",
+            (44, 197, 246),
+        )
 
     def animate(self):
         is_running = self.velocity.x != 0
