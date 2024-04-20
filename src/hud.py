@@ -29,8 +29,8 @@ class Hud:
 
         self.debug(
             "dt",
-            "\u0394",
             f"{(dt * 1_000):.2f}",
+            "\u0394",
             unit="ms",
         )
 
