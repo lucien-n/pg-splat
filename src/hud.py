@@ -27,31 +27,47 @@ class Hud:
             return
         self.last_update_at = self.game.now
 
-        self.debug_lines["dt"] = {
-            "value": f"{(dt * 1_000):.2f}",
-            "label": "\u0394",
-            "unit": "ms",
-        }
+        self.debug(
+            "dt",
+            "\u0394",
+            f"{(dt * 1_000):.2f}",
+            unit="ms",
+        )
 
         self.fps_list.append(math.floor(self.game.clock.get_fps()))
         self.fps_list = self.fps_list[-30:]
 
-        self.debug_lines["fps"] = {
-            "label": "\u2211",
-            "value": math.floor(np.mean(self.fps_list)),
-            "bg_color": (218, 113, 127),
-        }
+        self.debug(
+            "fps",
+            math.floor(np.mean(self.fps_list)),
+            "\u2211",
+            (218, 113, 127),
+        )
+
+        # draw movement keybinds
+        for bind in settings["keybinds"]["movements"]:
+            key = settings["keybinds"]["movements"][bind]
+            self.debug(
+                f"bind_{bind}",
+                f"{bind.upper()}: {"SPACE" if key == " " else key.upper()}",
+            )
 
         self.redraw()
 
     def redraw(self):
         self.rendered_lines.clear()
         for rendered_line in self.debug_lines.values():
+            value = rendered_line.get("value")
+            label = rendered_line.get("label")
+            unit = rendered_line.get("unit")
+            fg_color = rendered_line.get("fg_color", (255, 255, 255))
+            bg_color = rendered_line.get("bg_color", (253, 187, 109))
+
             rendered_line = self.render_font(
-                f'{rendered_line["label"]} {rendered_line["value"]}{rendered_line.get("unit", "")}',
+                f'{label + " " if label else ""}{value}{unit if unit else ""}',
                 20,
-                rendered_line.get("fg_color", (255, 255, 255)),
-                rendered_line.get("bg_color", (253, 187, 109)),
+                fg_color,
+                bg_color,
                 5,
             )
             self.rendered_lines.append(rendered_line)
@@ -66,15 +82,19 @@ class Hud:
         self,
         key: str,
         value: typing.Any,
-        label: str,
+        label: str | None = None,
         bg_color: pg.Color | None = None,
         fg_color: pg.Color | None = None,
+        unit: str | None = None,
     ):
         self.debug_lines[key] = {
-            "label": label,
             "value": str(value),
         }
 
+        if label:
+            self.debug_lines[key]["label"] = label
+        if unit:
+            self.debug_lines[key]["unit"] = unit
         if bg_color:
             self.debug_lines[key]["bg_color"] = bg_color
         if fg_color:
