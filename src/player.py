@@ -31,7 +31,7 @@ class Player(Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.hit_rect = self.rect.inflate(-12, -8)
 
-        self.draw_outline = False
+        self.debug = False
         self.flipped = False
 
         self.movement_binds = settings["keybinds"]["movements"]
@@ -67,6 +67,9 @@ class Player(Sprite):
 
         if keys[ord(self.movement_binds["jump"])]:
             self.jump = True
+
+        if pg.key.get_just_pressed()[settings["keybinds"]["misc"]["debug"]]:
+            self.debug = not self.debug
 
         self.velocity.x = input_vector.normalize().x if input_vector else input_vector.x
 
@@ -228,18 +231,18 @@ class Player(Sprite):
         target.blit(self.image, (display_width - self.rect.w, 0))
         target.blit(self.image, apply_scroll(self.rect, scroll))
 
-        if self.draw_outline:
-            pg.draw.lines(
-                target,
-                Color.WHITE,
-                False,
-                [
-                    (x + self.rect.x - scroll.x, y + self.rect.y - scroll.y)
-                    for x, y in self.mask.outline(every=1)
-                ],
-            )
+        # draw outline
+        # pg.draw.lines(
+        #         target,
+        #         Color.WHITE,
+        #         False,
+        #         [
+        #             (x + self.rect.x - scroll.x, y + self.rect.y - scroll.y)
+        #             for x, y in self.mask.outline(every=1)
+        #         ],
+        #     )
 
-        if DRAW_RECTS:
+        if self.debug:
             pg.draw.rect(
                 target, Color.GREEN, apply_scroll(self.hit_rect, scroll, "rect"), 1
             )

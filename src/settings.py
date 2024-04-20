@@ -8,7 +8,7 @@ settings = {
     "camera": {"smoothness": 180},
     "keybinds": {
         "movements": {"jump": " ", "right": "d", "left": "a"},
-        "misc": {"debug": "f3"},
+        "misc": {"debug": pg.K_F3},
     },
 }
 

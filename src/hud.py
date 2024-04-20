@@ -61,7 +61,7 @@ class Hud:
             key = settings["keybinds"]["misc"][bind]
             self.debug(
                 f"bind_{bind}",
-                f"{bind.upper()}: {"SPACE" if key == " " else key.upper()}",
+                f"{bind.upper()}: {"SPACE" if key == " " else str(key).upper()}",
                 bg_color=(83, 191, 92),
             )
 
