@@ -29,7 +29,7 @@ class Player(Sprite):
         self.image.set_colorkey(Color.BLACK)
         self.rect = self.image.get_frect(topleft=(x, y))
         self.mask = pg.mask.from_surface(self.image)
-        self.hit_rect = self.rect.inflate(-12, -9)
+        self.hit_rect = self.rect.inflate(-12, -8)
 
         self.draw_outline = False
         self.flipped = False
