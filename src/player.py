@@ -84,8 +84,20 @@ class Player(Sprite):
             if not wall.rect.colliderect(self.hit_rect):
                 continue
 
-            # bottom
             if (
+                self.hit_rect.right >= wall.rect.left
+                and self.old_rect.right < wall.old_rect.left + 1
+            ):
+                self.hit_rect.right = wall.rect.left
+            # left
+            elif (
+                self.hit_rect.left <= wall.rect.right
+                and self.old_rect.left > wall.old_rect.right - 1
+            ):
+                self.hit_rect.left = wall.rect.right
+
+            # bottom
+            elif (
                 self.hit_rect.bottom >= wall.rect.top
                 and self.old_rect.bottom < wall.old_rect.top + 1
             ):
@@ -99,17 +111,6 @@ class Player(Sprite):
                 self.hit_rect.top = wall.rect.bottom
                 self.velocity.y = 0
             # right
-            elif (
-                self.hit_rect.right >= wall.rect.left
-                and self.old_rect.right < wall.old_rect.left + 1
-            ):
-                self.hit_rect.right = wall.rect.left
-            # left
-            elif (
-                self.hit_rect.left <= wall.rect.right
-                and self.old_rect.left > wall.old_rect.right - 1
-            ):
-                self.hit_rect.left = wall.rect.right
 
     def move(self, dt: float):
         # horizontal
